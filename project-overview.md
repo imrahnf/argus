@@ -594,7 +594,7 @@ pipeline_options = PipelineOptions([
     '--runner=DataflowRunner',        # Use DirectRunner for local testing
     f'--temp_location=gs://{BUCKET}/dataflow/temp',
     f'--staging_location=gs://{BUCKET}/dataflow/staging',
-    f'--region=northamerica-northeast1',  # Toronto — lowest latency for CA banking
+    f'--region=northamerica-northeast2',  # Toronto — lowest latency for CA banking
     '--streaming',
     '--max_num_workers=2',             # HARD CAP — prevents bill explosion
     '--disk_size_gb=30',               # Minimum viable disk
@@ -827,7 +827,7 @@ variable "project_id" {
 variable "region" {
   description = "GCP region for all resources"
   type        = string
-  default     = "northamerica-northeast1"
+  default     = "northamerica-northeast2"
 }
 
 variable "environment" {
@@ -869,7 +869,7 @@ output "dataflow_service_account" {
 
 > **Note:** Create the state bucket manually once before running `terraform init`:
 > ```bash
-> gsutil mb -l northamerica-northeast1 gs://argus-terraform-state
+> gsutil mb -l northamerica-northeast2 gs://argus-terraform-state
 > ```
 
 ---
@@ -915,7 +915,7 @@ pip install -r requirements.txt
 python beam/pipeline.py \
   --runner=DataflowRunner \
   --project=YOUR_PROJECT_ID \
-  --region=northamerica-northeast1 \
+  --region=northamerica-northeast2 \
   --temp_location=gs://YOUR_PROJECT_ID-argus-dataflow/temp \
   --staging_location=gs://YOUR_PROJECT_ID-argus-dataflow/staging \
   --streaming \
@@ -928,8 +928,8 @@ python beam/pipeline.py \
 
 ```bash
 # 1. Cancel running Dataflow jobs first
-gcloud dataflow jobs list --region=northamerica-northeast1 --status=active
-gcloud dataflow jobs cancel JOB_ID --region=northamerica-northeast1
+gcloud dataflow jobs list --region=northamerica-northeast2 --status=active
+gcloud dataflow jobs cancel JOB_ID --region=northamerica-northeast2
 
 # 2. Destroy all Terraform-managed resources
 cd terraform/
@@ -956,14 +956,14 @@ terraform destroy -var="project_id=YOUR_PROJECT_ID"
 1. **Dataflow Workers:** `max_num_workers = 2`. Never remove this cap.
 2. **Stop Streaming Jobs:** When not developing, stop the Dataflow job. Streaming jobs bill by the minute. Use this command:
    ```bash
-   gcloud dataflow jobs cancel JOB_ID --region=northamerica-northeast1
+   gcloud dataflow jobs cancel JOB_ID --region=northamerica-northeast2
    ```
 3. **BigQuery:** Use **on-demand pricing** only. Never switch to flat-rate/reservations. The `require_partition_filter = true` on all tables prevents accidental full-table scans.
 4. **GCS Lifecycle:** DLQ bucket auto-deletes records after 30 days. Staging bucket cleans up after 7 days.
 5. **No Cloud Composer:** Composer requires a GKE cluster running 24/7 (~$300/month). Use Cloud Functions for scheduled tasks instead.
 6. **Budget Alert:** Set a hard budget of **$25/month** in GCP Billing → Budgets & Alerts.
 7. **Local Testing:** Always test with `DirectRunner` first. Only deploy to `DataflowRunner` when validating end-to-end.
-8. **Region:** Use `northamerica-northeast1` (Toronto/Montréal). Closest to Scotiabank HQ, lowest latency, and GCP has competitive pricing in this region.
+8. **Region:** Use `northamerica-northeast2` (Toronto). Closest to Scotiabank HQ, lowest latency, and GCP has competitive pricing in this region.
 
 ### 9.3 Emergency Kill Script
 
@@ -973,7 +973,7 @@ terraform destroy -var="project_id=YOUR_PROJECT_ID"
 set -euo pipefail
 
 PROJECT_ID=$(gcloud config get-value project)
-REGION="northamerica-northeast1"
+REGION="northamerica-northeast2"
 
 echo "🛑 Cancelling all Dataflow jobs..."
 for job_id in $(gcloud dataflow jobs list --region=$REGION --status=active --format="value(id)"); do

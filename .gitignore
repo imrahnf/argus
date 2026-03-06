@@ -1,3 +1,6 @@
+# Others
+outputs.txt
+
 # Terraform
 .terraform/
 *.tfstate

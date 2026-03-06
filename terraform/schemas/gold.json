@@ -1,0 +1,11 @@
+[
+  { "name": "summary_date", "type": "DATE", "mode": "REQUIRED", "description": "Date of the summary" },
+  { "name": "total_transactions", "type": "INT64", "mode": "REQUIRED", "description": "Total transactions processed" },
+  { "name": "total_flagged", "type": "INT64", "mode": "REQUIRED", "description": "Transactions with risk_score >= 70" },
+  { "name": "total_amount_processed", "type": "NUMERIC", "mode": "REQUIRED", "description": "Total amount across all transactions" },
+  { "name": "total_amount_flagged", "type": "NUMERIC", "mode": "REQUIRED", "description": "Total amount in flagged transactions" },
+  { "name": "avg_risk_score", "type": "FLOAT64", "mode": "REQUIRED", "description": "Average risk score for the day" },
+  { "name": "top_risk_zone", "type": "STRING", "mode": "NULLABLE", "description": "Zone with the most flagged transactions" },
+  { "name": "high_velocity_cards", "type": "INT64", "mode": "REQUIRED", "description": "Cards with window_tx_count > 5" },
+  { "name": "fraud_rate_pct", "type": "FLOAT64", "mode": "REQUIRED", "description": "(flagged / total) * 100" }
+]

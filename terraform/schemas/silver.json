@@ -1,0 +1,15 @@
+[
+  { "name": "tx_id", "type": "STRING", "mode": "REQUIRED", "description": "Globally unique transaction identifier" },
+  { "name": "card_id", "type": "STRING", "mode": "REQUIRED", "description": "Masked card identifier" },
+  { "name": "amount", "type": "NUMERIC", "mode": "REQUIRED", "description": "Transaction amount in the given currency" },
+  { "name": "currency", "type": "STRING", "mode": "REQUIRED", "description": "ISO 4217 currency code" },
+  { "name": "merchant_id", "type": "STRING", "mode": "REQUIRED", "description": "Merchant where the transaction occurred" },
+  { "name": "lat", "type": "FLOAT64", "mode": "REQUIRED", "description": "Latitude of transaction origin" },
+  { "name": "lon", "type": "FLOAT64", "mode": "REQUIRED", "description": "Longitude of transaction origin" },
+  { "name": "event_timestamp", "type": "TIMESTAMP", "mode": "REQUIRED", "description": "Original transaction time" },
+  { "name": "risk_zone", "type": "STRING", "mode": "REQUIRED", "description": "HIGH_RISK, MEDIUM_RISK, or STANDARD" },
+  { "name": "risk_score", "type": "INT64", "mode": "REQUIRED", "description": "0-100 composite risk score" },
+  { "name": "window_tx_count", "type": "INT64", "mode": "NULLABLE", "description": "Transactions by this card in the 5-min window" },
+  { "name": "ingestion_timestamp", "type": "TIMESTAMP", "mode": "REQUIRED", "description": "When the pipeline wrote it" },
+  { "name": "pubsub_message_id", "type": "STRING", "mode": "NULLABLE", "description": "Pub/Sub dedup key" }
+]

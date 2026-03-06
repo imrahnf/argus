@@ -1,0 +1,7 @@
+[
+  { "name": "ingestion_id", "type": "STRING", "mode": "REQUIRED", "description": "Pipeline-assigned UUID" },
+  { "name": "raw_payload", "type": "STRING", "mode": "REQUIRED", "description": "Original JSON string" },
+  { "name": "pubsub_message_id", "type": "STRING", "mode": "NULLABLE", "description": "Pub/Sub dedup key" },
+  { "name": "pubsub_publish_time", "type": "TIMESTAMP", "mode": "REQUIRED", "description": "When Pub/Sub received it" },
+  { "name": "ingestion_timestamp", "type": "TIMESTAMP", "mode": "REQUIRED", "description": "When the pipeline wrote it" }
+]
