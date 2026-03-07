@@ -48,14 +48,18 @@ class ValidateTransactions(beam.DoFn):
             assert isinstance(record.get("amount"), (int, float)), "amount is missing or not a number"
             assert 0 < record["amount"] < 1000000, "amount is not in range"
 
+            # validate merchant_id
+            assert isinstance(record.get("merchant_id"), str) and record["merchant_id"].strip() != "", \
+                "merchant_id is missing or empty"
+
             # validate the currency
             assert record.get("currency") in self.ALLOWED_CURRENCIES, f"currency {record.get('currency')} is not allowed"
 
             # validate lat/long (lat -+90 = north/south, long -+180 = east/west)
-            assert isinstance(record.get("latitude"), (int, float)), "latitude is missing or not a number"
-            assert isinstance(record.get("longitude"), (int, float)), "longitude is missing or not a number"
-            assert -90 <= record["latitude"] <= 90, "latitude is out of range"
-            assert -180 <= record["longitude"] <= 180, "longitude is out of range"
+            assert isinstance(record.get("lat"), (int, float)), "latitude is missing or not a number"
+            assert isinstance(record.get("lon"), (int, float)), "longitude is missing or not a number"
+            assert -90 <= record["lat"] <= 90, "latitude is out of range"
+            assert -180 <= record["lon"] <= 180, "longitude is out of range"
 
             # timestamp validation
             datetime.fromisoformat(record["timestamp"].replace("Z", "+00:00"))  # will raise if not valid ISO format

@@ -21,8 +21,9 @@ def make_message(overrides=None):
         "card_id": "CARD-A1B2C3D4",
         "amount": 150.00,
         "currency": "CAD",
-        "latitude": 43.65,
-        "longitude": -79.38,
+        "merchant_id": "MERCHANT-001",
+        "lat": 43.65,
+        "lon": -79.38,
         "timestamp": "2026-03-07T12:00:00Z"
     }
     if overrides:
@@ -200,6 +201,26 @@ class TestCurrency:
 
 
 # ──────────────────────────────────────────────
+# merchant_id Tests
+# ──────────────────────────────────────────────
+
+class TestMerchantId:
+    """Tests for the merchant_id field validation."""
+
+    def test_missing_merchant_id_rejected(self):
+        msg = make_message({'merchant_id': None})
+        with TestPipeline() as p:
+            results = run_pipeline(p, [msg])
+            assert_that(results[ValidateTransactions.VALID], equal_to([]), label='valid_empty')
+
+    def test_empty_merchant_id_rejected(self):
+        msg = make_message({'merchant_id': '   '})
+        with TestPipeline() as p:
+            results = run_pipeline(p, [msg])
+            assert_that(results[ValidateTransactions.VALID], equal_to([]), label='valid_empty')
+
+
+# ──────────────────────────────────────────────
 # Lat / Lon Tests
 # ──────────────────────────────────────────────
 
@@ -207,13 +228,13 @@ class TestCoordinates:
     """Tests for latitude and longitude range validation."""
 
     def test_latitude_out_of_range(self):
-        msg = make_message({'latitude': 91.0})
+        msg = make_message({'lat': 91.0})
         with TestPipeline() as p:
             results = run_pipeline(p, [msg])
             assert_that(results[ValidateTransactions.VALID], equal_to([]), label='valid_empty')
 
     def test_longitude_out_of_range(self):
-        msg = make_message({'longitude': -200.0})
+        msg = make_message({'lon': -200.0})
         with TestPipeline() as p:
             results = run_pipeline(p, [msg])
             assert_that(results[ValidateTransactions.VALID], equal_to([]), label='valid_empty')
