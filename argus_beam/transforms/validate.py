@@ -1,3 +1,4 @@
+# /argus_beam/transforms/validate.py
 import re
 import uuid
 import json
@@ -5,7 +6,6 @@ from datetime import datetime, timezone
 
 import apache_beam as beam
 
-# /beam/transforms/validate.py
 class ValidateTransactions(beam.DoFn):
     '''
     Validates incoming transactions in JSON against the Argus schema
