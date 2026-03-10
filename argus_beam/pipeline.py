@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 # Apache Beam imports
 import apache_beam as beam
 from apache_beam import window
-from apache_beam.options.pipeline_options import PipelineOptions, StandardOptions
+from apache_beam.options.pipeline_options import PipelineOptions, StandardOptions, GoogleCloudOptions
 
 # Local imports
 from argus_beam.transforms.validate import ValidateTransactions
@@ -156,28 +156,33 @@ def run():
     """
 
     parser = argparse.ArgumentParser()
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--project_id",required=True, help="GCP project ID")
-    parser.add_argument("--subscription",required=True, help="Pub/Sub subscription path")
-    parser.add_argument("--dlq_bucket",required=True, help="GCS bucket for dead letters")
-    parser.add_argument("--bq_dataset",default="argus_dataset", help="BigQuery dataset ID")
+    parser.add_argument("--subscription", required=True, help="Pub/Sub subscription path")
+    parser.add_argument("--dlq_bucket",   required=True, help="GCS bucket for dead letters")
+    parser.add_argument("--bq_dataset",   default="argus_dataset", help="BigQuery dataset ID")
     known_args, pipeline_args = parser.parse_known_args()
 
-    # Pipeline options
+    # Pipeline options — Beam/Dataflow reads --project, --region, --runner, etc. natively
     options = PipelineOptions(
         pipeline_args,
         streaming=True,
         save_main_session=True,
     )
 
+    # Read project from GoogleCloudOptions so we don't duplicate --project
+    # and avoid argparse prefix-matching collision (--project matching --project_id)
+    project_id = options.view_as(GoogleCloudOptions).project
+
+    if not project_id:
+        raise ValueError("--project must be provided (e.g. --project=argus-489417)")
+
     with beam.Pipeline(options=options) as p:
         build_pipeline(
             p,
-            project_id=known_args.project_id,
+            project_id=project_id,
             subscription=known_args.subscription,
             dlq_bucket=known_args.dlq_bucket,
             bq_dataset=known_args.bq_dataset
-        )   
+        )
 
 if __name__ == "__main__":
     run()
