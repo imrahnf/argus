@@ -31,6 +31,8 @@ Argus is a production-grade streaming pipeline built on **GCP Dataflow** that va
 
 ## Architecture
 
+Argus is composed of five independent layers, each with a single responsibility. Transactions originate in a Java Spring Boot producer, travel through GCP Pub/Sub for durable delivery, are processed and enriched by an Apache Beam pipeline running on Dataflow, and land in a three-tier BigQuery data warehouse. A daily Cloud Function materializes the Gold aggregation layer, which feeds a Looker Studio fraud dashboard.
+
 ```mermaid
 flowchart LR
     subgraph Producer ["Java Producer (Spring Boot)"]
@@ -76,6 +78,18 @@ flowchart LR
 ```
 
 ![Dataflow DAG — Live Pipeline](docs/images/dataflow-dag.gif)
+
+### Component Summary
+
+| Layer | Technology | Role |
+|---|---|---|
+| **Producer** | Java 17 · Spring Boot | Generates synthetic transactions and publishes them to Pub/Sub at configurable throughput |
+| **Message Bus** | GCP Pub/Sub | Durable, exactly-once delivery with 7-day retention and native backpressure |
+| **Stream Processor** | Apache Beam · GCP Dataflow | Schema validation → geo-fence enrichment → 5-min sliding window velocity detection |
+| **Dead Letter Queue** | GCS (`argus-dlq/`) | Captures malformed records with full error metadata, partitioned by `year/month/day/hour` |
+| **Data Warehouse** | BigQuery (Bronze / Silver / Gold) | Medallion-patterned warehouse; Bronze for audit, Silver for analytics, Gold for reporting |
+| **Orchestration** | Cloud Functions | Daily idempotent `MERGE` upsert that refreshes the Gold summary table |
+| **Visualization** | Looker Studio | Live fraud dashboard connected directly to the Gold BigQuery table |
 
 ---
 
